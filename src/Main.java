@@ -25,21 +25,11 @@ public class Main {
         printGoods(goods);
 
         //выводим на экран доступные действия
-        printMenu(myBasket);
+        printMenu(goods, myBasket);
 
-//        Scanner scanner = new Scanner(System.in);
-
-//        System.out.print("Введите номер продукта (№) и количество (К) в формате '№-К':");
-        //int price = scanner.nextInt();
-
-//        System.out.print("Введите вес товара (в кг.):");
-//        int weight = scanner.nextInt();
-//
-//        int duty = CustomService.dutyCalculate (price, weight);
-//        System.out.print("Размер пошлины (в руб.) составит: " + duty);
     }
 
-    private static void printMenu(Basket myBasket) {
+    private static void printMenu(ArrayList goods, Basket myBasket) {
 
         if (myBasket.sum > 0) {
             Scanner scanner = new Scanner(System.in);
@@ -54,29 +44,31 @@ public class Main {
             int action = scanner.nextInt();
             switch (action) {
                 case 1:
-                    addToBasket();
+                    addToBasket(goods, myBasket);
                     break;
                 case 2:
-                    delFromBasket();
+                    delFromBasket(myBasket);
                     break;
                 case 3:
                     findDelay();
                     break;
                 case 4:
-                    addGradle();
+                    //addGradle(myBasket);
                     break;
                 case 5:
                     payBasket(myBasket);
+                    printMenu(goods, myBasket);
                     break;
                 default:
                     System.out.println("---------- некорректный ввод...");
-                    printMenu(myBasket);
+                    printMenu(goods, myBasket);
             }
         } else {
             System.out.println("---------- Корзина пуста...");
-            addToBasket();
+            addToBasket(goods, myBasket);
         }
-
+        printBasket(myBasket);
+        printMenu(goods,myBasket);
 
     }
 
@@ -92,27 +84,42 @@ public class Main {
     private static void findDelay() {
     }
 
-    private static void delFromBasket() {
+    private static void delFromBasket(Basket myBasket) {
+        printBasket(myBasket);
     }
 
-    private static void addToBasket() {
+    private static void addToBasket(ArrayList goods, Basket myBasket) {
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("---------- Добавление товаров в корзину...");
-        String action = scanner.nextLine();
         System.out.print("Введите номер продукта (N) и количество (Q) в формате 'N-Q': => ");
 
+        String action = scanner.nextLine();
+        String[] parts = action.split("-");
+        int number = Integer.parseInt(parts[0]) - 1;
+        int quantity = Integer.parseInt(parts[1]);
+
+        myBasket.addGood((Goods) goods.get(number), quantity);
     }
 
     public static void printGoods(ArrayList goods) {
         System.out.println("---------- Товары в нашем магазине...");
         for (int i = 0; i < goods.size(); i++) {
             Goods str = (Goods) goods.get(i);
-            printGood(str, i);
+            printGood(str, i, 0);
         }
     }
 
-    public static void printGood(Goods str, int i) {
+    public static void printBasket(Basket myBasket) {
+        System.out.println("########################## Товары в Вашей корзине...");
+        for (int i = 0; i < myBasket.getBasketGoods().size(); i++) {
+            printGood((Goods) myBasket.getBasketGoods().get(i), i, (Integer) myBasket.getBasketQuantity().get(i));
+        }
+        System.out.println("______________________________________________________________________________________");
+        System.out.println("                                                      ИТОГО: " + myBasket.sum + " руб.");
+    }
+
+    public static void printGood(Goods str, int i, int q) {
         StringBuilder result = new StringBuilder();
         result.append(i + 1)
                 .append(" - ")
@@ -123,6 +130,11 @@ public class Main {
                 .append(str.getPrice())
                 .append("руб. / рейтинг ")
                 .append(str.getRating());
+        if (q > 0) {
+            result.append(" -- ")
+                    .append(q)
+                    .append("шт.");
+        }
         System.out.println(result);
     }
 
@@ -143,4 +155,8 @@ public class Main {
         return formatForDate.format(expDate);
     }
 
+
 }
+
+
+
