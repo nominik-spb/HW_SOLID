@@ -1,7 +1,14 @@
 import java.time.LocalDate;
 
-public class FoodGoods implements Goods {
+// Класс хранит данные и выполняет методы исключительно относящиеся
+// к данному экземпляру прод.товаров
+// принцип single-responsibility principle
 
+// принцип Interface segregation
+// принцип Dependency inversion
+public class FoodGoods implements Goods, GoodsDelay {
+
+    // принцип Open-closed
     private final String article;
     private final String name;
     private final double price;
@@ -17,6 +24,7 @@ public class FoodGoods implements Goods {
 
     }
 
+    @Override
     public LocalDate getDate() {
         return expDate;
     }

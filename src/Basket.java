@@ -1,5 +1,9 @@
 import java.util.ArrayList;
 
+// Класс хранит данные и выполняет методы исключительно
+// относящиеся к данному экземпляру корзины
+// принцип single-responsibility principle
+
 public class Basket {
 
     public ArrayList<Goods> goods = new ArrayList<>();

@@ -1,4 +1,8 @@
+// принцип Open-closed
+// принцип Interface segregation
+
 public interface Goods {
+
     String article = "";
     String name = "";
     double price = 0;

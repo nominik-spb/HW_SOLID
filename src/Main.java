@@ -5,6 +5,13 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+/* Программа предостовляет пользователю список продовольственных и
+    непродовольственных товаров к заказу. Заказ формируется в виде корзины
+    с возможностью добавления товара, удаления товара,
+    поиск просроченных продовольственных товаром, оценки товаров в корзине,
+    а также оплаты заказа (очистки корзины)
+*/
+
 public class Main {
 
     public static void main(String[] args) {
@@ -23,9 +30,11 @@ public class Main {
         //myBasket.sum = 200;
 
         //выводим на экран товары в магазине
+        // принцип DRY
         printGoods(goods);
 
         //выводим на экран доступные действия
+        // принцип DRY
         printMenu(goods, myBasket);
 
     }
@@ -142,7 +151,7 @@ public class Main {
         int number = Integer.parseInt(parts[0]) - 1;
         int quantity = Integer.parseInt(parts[1]);
 
-
+        // принцип избегания магических чисел
         if (number < 0 || number > goods.size() - 1) {
             System.out.println("--------------- введен некорректный номер товара в магазине");
             addToBasket(goods, myBasket);
@@ -155,6 +164,7 @@ public class Main {
     // метод выводит на экран товары в магазине
     public static void printGoods(ArrayList<Goods> goods) {
         System.out.println("############### Товары в нашем магазине ###############");
+        // принцип избегания магических чисел
         for (int i = 0; i < goods.size(); i++) {
             Goods str = goods.get(i);
             printGood(str, i, 0);
@@ -164,6 +174,7 @@ public class Main {
     // метод выводит на экран товары в корзине
     public static void printBasket(Basket myBasket) {
         System.out.println("############### Товары в Вашей корзине ###############");
+        // принцип избегания магических чисел
         for (int i = 0; i < myBasket.getBasketGoods().size(); i++) {
             printGood(myBasket.getBasketGoods().get(i), i, myBasket.getBasketQuantity().get(i));
         }
@@ -172,6 +183,7 @@ public class Main {
     }
 
     // метод выводит на экран i-ю строку из передаваемого массива строк
+    // принцип DRY для методов printGoods и printBasket
     public static void printGood(Goods str, int i, int q) {
         StringBuilder result = new StringBuilder();
         result.append(i + 1)

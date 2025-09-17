@@ -1,4 +1,11 @@
+// Класс хранит данные и выполняет методы исключительно
+// относящиеся к данному экземпляру непрод. товаров
+// принцип single-responsibility principle
+
+// принцип Dependency inversion
 public class HouseGoods implements Goods {
+
+    // принцип Open-closed
     private final String article;
     private final String name;
     private final double price;
