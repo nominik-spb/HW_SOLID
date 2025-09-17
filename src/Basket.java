@@ -7,9 +7,9 @@ public class Basket {
     public double sum = 0;
 
     public void addGood(Goods good, Integer quantity) {
-        if(goods.contains(good)) {
+        if (goods.contains(good)) {
             int i = this.goods.lastIndexOf(good);
-            this.quantity.set(i, this.quantity.get(i)+quantity);
+            this.quantity.set(i, this.quantity.get(i) + quantity);
         } else {
             this.goods.add(good);
             this.quantity.add(quantity);
@@ -17,15 +17,10 @@ public class Basket {
         calcSum();
     }
 
-    public void delGood(Goods good) {
-        int i= this.goods.lastIndexOf(good);
-        this.goods.remove(i);
-        this.quantity.remove(i);
+    public void delGood(int number) {
+        goods.remove(number);
+        quantity.remove(number);
         calcSum();
-    }
-
-    public void findDelay() {
-
     }
 
     public void clear() {
@@ -41,12 +36,12 @@ public class Basket {
         }
     }
 
-    public ArrayList getBasketGoods() {
-return this.goods;
+    public ArrayList<Goods> getBasketGoods() {
+        return goods;
     }
 
-    public ArrayList getBasketQuantity() {
-        return this.quantity;
+    public ArrayList<Integer> getBasketQuantity() {
+        return quantity;
     }
 
 }

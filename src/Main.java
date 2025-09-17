@@ -1,21 +1,22 @@
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Main {
 
     public static void main(String[] args) {
 
         //создаем продуктовые товары
-        ArrayList goods = new ArrayList<Goods>();
-        goods.add(new foodGoods("154786", "Колбаса докторская. 400гр", 325.56, setDate("2025-11-15")));
-        goods.add(new foodGoods("154754", "Сыр Российский. 180гр", 220.00, setDate("2025-09-01")));
-        goods.add(new foodGoods("154786", "Масло сливочное. 180гр", 255.99, setDate("2026-01-12")));
+        ArrayList<Goods> goods = new ArrayList<>();
+        goods.add(new FoodGoods("154786", "Колбаса докторская. 400гр", 325.50, setDate("2025,09,28")));
+        goods.add(new FoodGoods("154754", "Сыр Российский. 180гр", 220.00, setDate("2025,09,01")));
+        goods.add(new FoodGoods("154786", "Масло сливочное. 180гр", 255.90, setDate("2026,01,12")));
         //создаем не продуктовые товары
-        goods.add(new houseGoods("129562", "Шампунь-кондиционер. 450мл", 412.20));
-        goods.add(new houseGoods("124002", "Туалетная бумага. 4рул", 160.20));
+        goods.add(new HouseGoods("129562", "Шампунь-кондиционер. 450мл", 412.20));
+        goods.add(new HouseGoods("124002", "Туалетная бумага. 4рул", 160.20));
 
         //создаем экземпляр корзины
         Basket myBasket = new Basket();
@@ -29,96 +30,148 @@ public class Main {
 
     }
 
-    private static void printMenu(ArrayList goods, Basket myBasket) {
+    // метод выводит на экран меню для действий с корзиной
+    private static void printMenu(ArrayList<Goods> goods, Basket myBasket) {
 
         if (myBasket.sum > 0) {
             Scanner scanner = new Scanner(System.in);
-            System.out.println("----------- Действия с корзиной");
-            System.out.println("1. Добавить в корзину");
-            System.out.println("2. Удалить из корзины");
-            System.out.println("3. Найти просрочку в корзине (только прод.товары)");
-            System.out.println("4. Оценить товар в корзине");
-            System.out.println("5. Оплатить товар в корзине");
-            System.out.print("   Введите номер действия: => ");
+            System.out.println("############### Действия с товарами в корзине ###############");
+            System.out.print("|1-Добавить|");
+            System.out.print("2-Удалить|");
+            System.out.print("3-Найти просроченный (только прод.)|");
+            System.out.print("4-Оценить|");
+            System.out.print("5-Оплатить все|");
+            System.out.print("Введите номер действия: => ");
 
             int action = scanner.nextInt();
             switch (action) {
                 case 1:
                     addToBasket(goods, myBasket);
+                    printBasket(myBasket);
+                    printMenu(goods, myBasket);
                     break;
                 case 2:
                     delFromBasket(myBasket);
+                    printBasket(myBasket);
+                    printMenu(goods, myBasket);
                     break;
                 case 3:
-                    findDelay();
+                    findDelay(myBasket);
+                    printMenu(goods, myBasket);
                     break;
                 case 4:
-                    //addGradle(myBasket);
+                    addGradle(myBasket, goods);
+                    printGoods(goods);
+                    printMenu(goods, myBasket);
                     break;
                 case 5:
                     payBasket(myBasket);
+                    printGoods(goods);
                     printMenu(goods, myBasket);
                     break;
                 default:
-                    System.out.println("---------- некорректный ввод...");
+                    System.out.println("--------------- некорректный ввод ---------------");
                     printMenu(goods, myBasket);
             }
         } else {
-            System.out.println("---------- Корзина пуста...");
+            System.out.println("--------------- Корзина пуста ---------------");
             addToBasket(goods, myBasket);
+            printBasket(myBasket);
+            printMenu(goods, myBasket);
         }
-        printBasket(myBasket);
-        printMenu(goods,myBasket);
-
     }
 
+    // метод очистки корзины
     private static void payBasket(Basket myBasket) {
         myBasket.clear();
-        System.out.println("---------- Оплачено...");
-        System.out.println("---------- Корзина очищена...");
+        System.out.println("--------------- Оплачено ---------------");
+        System.out.println("--------------- Корзина очищена ---------------");
     }
 
-    private static void addGradle() {
+    // метод записи оценки в товары
+    private static void addGradle(Basket myBasket, ArrayList<Goods> goods) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("ОЦЕНКА: Введите номер продукта в корзине (N) и оценку в формате 'N/+' или 'N/-': => ");
+
+        String action = scanner.nextLine();
+        String[] parts = action.split("/");
+        int number = Integer.parseInt(parts[0]) - 1;
+        char gradle = parts[1].charAt(0);
+
+        if (number < 0 || number > myBasket.getBasketGoods().size() - 1) {
+            System.out.println("--------------- введен некорректный номер товара в корзине");
+            addGradle(myBasket, goods);
+        } else if (gradle != '+' && gradle != '-') {
+            System.out.println("--------------- введена некорректная оценка товара в корзине (только + или -)");
+            addGradle(myBasket, goods);
+        } else {
+            if ((gradle == '+')) {
+                goods.get(number).setRating(1);
+            } else {
+                goods.get(number).setRating(-1);
+            }
+            System.out.println("--------------- Оценка добавлена ---------------");
+        }
     }
 
-    private static void findDelay() {
-    }
-
+    // метод удаления товара из корзины
     private static void delFromBasket(Basket myBasket) {
-        printBasket(myBasket);
-    }
-
-    private static void addToBasket(ArrayList goods, Basket myBasket) {
 
         Scanner scanner = new Scanner(System.in);
-        System.out.println("---------- Добавление товаров в корзину...");
-        System.out.print("Введите номер продукта (N) и количество (Q) в формате 'N-Q': => ");
+
+        System.out.print("УДАЛЕНИЕ: Введите номер продукта в корзине 'N': => ");
+
+        int numGood = scanner.nextInt() - 1;
+        if (numGood < 0 || numGood > myBasket.goods.size() - 1) {
+            System.out.println("--------------- введен некорректный номер товара в корзине...");
+            delFromBasket(myBasket);
+        } else {
+            myBasket.delGood(numGood);
+            System.out.println("--------------- Товар удален ---------------");
+        }
+    }
+
+    // метод добавления товара в корзину
+    private static void addToBasket(ArrayList<Goods> goods, Basket myBasket) {
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("ДОБАВЛЕНИЕ: Введите номер продукта (N) и количество (Q) в формате 'N-Q': => ");
 
         String action = scanner.nextLine();
         String[] parts = action.split("-");
         int number = Integer.parseInt(parts[0]) - 1;
         int quantity = Integer.parseInt(parts[1]);
 
-        myBasket.addGood((Goods) goods.get(number), quantity);
+
+        if (number < 0 || number > goods.size() - 1) {
+            System.out.println("--------------- введен некорректный номер товара в магазине");
+            addToBasket(goods, myBasket);
+        } else {
+            myBasket.addGood(goods.get(number), quantity);
+            System.out.println("--------------- Товар добавлен ---------------");
+        }
     }
 
-    public static void printGoods(ArrayList goods) {
-        System.out.println("---------- Товары в нашем магазине...");
+    // метод выводит на экран товары в магазине
+    public static void printGoods(ArrayList<Goods> goods) {
+        System.out.println("############### Товары в нашем магазине ###############");
         for (int i = 0; i < goods.size(); i++) {
-            Goods str = (Goods) goods.get(i);
+            Goods str = goods.get(i);
             printGood(str, i, 0);
         }
     }
 
+    // метод выводит на экран товары в корзине
     public static void printBasket(Basket myBasket) {
-        System.out.println("########################## Товары в Вашей корзине...");
+        System.out.println("############### Товары в Вашей корзине ###############");
         for (int i = 0; i < myBasket.getBasketGoods().size(); i++) {
-            printGood((Goods) myBasket.getBasketGoods().get(i), i, (Integer) myBasket.getBasketQuantity().get(i));
+            printGood(myBasket.getBasketGoods().get(i), i, myBasket.getBasketQuantity().get(i));
         }
-        System.out.println("______________________________________________________________________________________");
-        System.out.println("                                                      ИТОГО: " + myBasket.sum + " руб.");
+        System.out.println("_____________________________________________________________________");
+        System.out.println("                                                  ИТОГО: " + myBasket.sum + " руб.");
     }
 
+    // метод выводит на экран i-ю строку из передаваемого массива строк
     public static void printGood(Goods str, int i, int q) {
         StringBuilder result = new StringBuilder();
         result.append(i + 1)
@@ -138,25 +191,36 @@ public class Main {
         System.out.println(result);
     }
 
-    public static Date setDate(String expDate) {
-        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd");
-        String str = expDate.length() == 0 ? "0000-00-00" : expDate;
-        Date parsingDate = null;
-        try {
-            parsingDate = ft.parse(str);
-        } catch (ParseException e) {
-            System.out.println("не получилось распарсить " + ft);
+    // метод выводит на экран прод.товары из корзины с просроченной датой на текущий момент
+    public static void findDelay(Basket myBasket) {
+
+        List<FoodGoods> foodGoodsBasket = myBasket.getBasketGoods().stream()
+                .filter(obj -> obj instanceof FoodGoods)
+                .map(obj -> (FoodGoods) obj)
+                .collect(Collectors.toList());
+
+        int j = 0;
+        StringBuilder text = new StringBuilder().append("ПРОСРОЧКА: ");
+        for (int i = 0; i < foodGoodsBasket.size(); i++) {
+            if (foodGoodsBasket.get(i).getDate().isBefore(LocalDate.now())) {
+                j++;
+                text.append(foodGoodsBasket.get(i).getName()).append(";");
+            }
         }
-        return parsingDate;
+        if (j == 0) {
+            text.append("нет");
+        }
+        ;
+        System.out.println(text);
     }
 
-    public static String getDate(Date expDate) {
-        SimpleDateFormat formatForDate = new SimpleDateFormat("dd.MM.yy");
-        return formatForDate.format(expDate);
-    }
+    // метод преобразует дату в String формате при начальном заполнении магазина в формат LocalDate
+    public static LocalDate setDate(String strDate) {
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy,MM,dd");
+
+        return LocalDate.parse(strDate, formatter);
+
+    }
 
 }
-
-
-
