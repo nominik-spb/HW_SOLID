@@ -206,9 +206,9 @@ public class Main {
     // метод выводит на экран прод.товары из корзины с просроченной датой на текущий момент
     public static void findDelay(Basket myBasket) {
 
-        List<FoodGoods> foodGoodsBasket = myBasket.getBasketGoods().stream()
-                .filter(obj -> obj instanceof FoodGoods)
-                .map(obj -> (FoodGoods) obj)
+        List<GoodsDelay> foodGoodsBasket = myBasket.getBasketGoods().stream()
+                .filter(obj -> obj instanceof GoodsDelay)
+                .map(obj -> (GoodsDelay) obj)
                 .collect(Collectors.toList());
 
         int j = 0;
